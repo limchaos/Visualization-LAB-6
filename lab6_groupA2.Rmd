@@ -10,7 +10,7 @@ output: html_document
 
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, message = FALSE, echo = FALSE)
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, echo = FALSE)
 ```
 
 
@@ -30,7 +30,7 @@ We have done most parts together, but Yifan mainly contributed to assignment 1. 
 ### Assignment 1.1 
 
 
-```{r, warning=FALSE, echo=TRUE, message=TRUE}
+```{r, warning=FALSE, echo=FALSE, message=FALSE}
 
 nodes <- read.table('trainMeta.dat')
 links <- read.table('trainData.dat')
@@ -153,12 +153,22 @@ fig
 
 ```
 
+**Answer:** From above bubble chart, we found following features: 
+
+* 1.China increased Oil usage drastically from 0 to 400 during this period.
+
+* 2.China, Brazil and India all almost have no Oil usage before 1965.
+
+* 3.Germany, UK, France decreased the usage of Coal.
+
+* 4.US consume the largest amount of Oil and Coal all the time from 1965 to 2009.
+
 
 ### Assignment 2.2
 ```{r}
 
 
-fig2 <- df%>%filter(Country %in% c("United Kingdom", "Germany"))%>%
+fig2 <- df%>%filter(Country %in% c("Brazil", "India"))%>%
   plot_ly(
     x = ~Coal, 
     y = ~Oil, 
@@ -179,6 +189,8 @@ fig2 <- fig2 %>% layout(
 fig2
  
 ```
+
+**Answer:** We find Brazil and India have the same motion pattern. India and Brazil both started their Oil industry in 1960s, which could refer to Wikipedia, [Oil and gas industry in India](https://en.wikipedia.org/wiki/Oil_and_gas_industry_in_India) and [Energy in Brazil](https://en.wikipedia.org/wiki/Energy_in_Brazil). Since they both start to use Oil from 1960s, it is possible that Brazil and India might have some similar purpose to consume or produce Oil, this might explain that why they have similar motion pattern from above chart.
 
 
 ### Assignment 2.3
@@ -217,8 +229,14 @@ fig3 <- fig3%>%add_trace(data = df3%>%filter(Country == countries_list[i]),
 
 }
 
-fig3
+fig3%>%animation_opts(100,redraw = F)
 ```
+
+**Answer:** 
+
+* Advantages: It is clear to find the proportion changing of Oil in each country, which could reveal the energy consumption structure. We can find following interesting information: China, France, Germany, India, and UK all increased the ratio of Oil Consumption, but US and Brazil almost keep the same energy consumption structure, whereas Japan decreased the ratio of Oil consumption.
+
+* Disadvantages: We could only compare the the Oil consumption proportion among those countries, but this animated bar chart can't reveal the real consumption of Oil. We can find from bubble chart that China is the second largest country in consuming Oil, but in the bar chart, China has the lowest Oil consumption ratio.
 
 
 
@@ -231,19 +249,11 @@ fig3%>%animation_opts(100, easing = "elastic", redraw = F)
 
 ```
 
+**Answer:**
 
+* Advantage: Unlike previous linear easing, this Elastic easing function make the animation more vivid, as  [easeInElastic](https://easings.net/#easeInElastic) described, `Objects in real life don’t just start and stop instantly, and almost never move at a constant speed. `, elastic easing could catch more attention from people who watch it.
 
-```{r}
-
-df_new <- data.frame(Year=c(1965:2009))
-rownames(df_new) <- df_new$Year
-
-for (i in countries_list) {
-  df_new[i] <-df%>%filter(Country==i)%>%select(Coal)
-}
-df_new <- df_new[, -1]
-
-```
+* Disadvantage: Elastic easing make the animation a little flashing, human could be tired by watching it.
 
 
 ### Assignment 2.5
@@ -253,9 +263,16 @@ df_new <- df_new[, -1]
 library(tourr)
 library(plotly)
 
+df_new <- data.frame(Year=c(1965:2009))
+rownames(df_new) <- df_new$Year
+
+for (i in countries_list) {
+  df_new[i] <-df%>%filter(Country==i)%>%select(Coal)
+}
+
+df_new <- df_new[, -1]
 
 mat <- rescale(df_new)
-
 set.seed(12345)
 tour <- new_tour(mat, grand_tour(), NULL)
 #tour<- new_tour(mat, guided_tour(cmass), NULL)
@@ -317,6 +334,28 @@ tour <- proj_dat %>%
 tour
 
 ```
+
+![Cluster Frame](newplot.png)
+
+```{r}
+coal_year<-df1%>%filter(Country == "US")%>%
+  plot_ly(x=~Year, y=~Coal,type = 'scatter',name = 'US',
+    mode = 'line')
+
+coal_year<-coal_year%>%add_trace(data = df1%>%filter(Country == "Brazil"),
+                 x = ~Year,
+                 y = ~Coal,
+                 name = "Brazil")
+
+coal_year<-coal_year%>%add_trace(data = df1%>%filter(Country == "India"),
+                 x = ~Year,
+                 y = ~Coal,
+                 name = "India")
+coal_year
+```
+
+
+**Answer:** We find above frame project the most seperated clusters, 4 clusters could be find from this frame, those clusters contain point from 1965 to 1977, 1979 to 1983, 1984 to 1999, 2000 to 2008, and seems 2009 is a outlier from those clusters which do belong to any clusters. We plot a time series on Coal for 3 longest axes countries, US, Brazil, and India. From the time series plot, it seems the slops of the curve have some correspondances with those clusters, from 1965 to 1977, the slop of all 3 countries are very low, then getting bigger, the slope changing might lead to new clusters, 2009 is a outlier which do not belong to any clusters, might because the Coal consumption of US suddenly decreased in 2009.
 
 # Appendix
 
