@@ -19,6 +19,9 @@ knitr::opts_chunk$set(warning = FALSE, message = FALSE, echo = FALSE)
 library(ggraph)
 library(igraph)
 library(visNetwork)
+library(plotly)
+library(gapminder)
+library(seriation)
 
 ```
 
@@ -32,92 +35,95 @@ We have done most parts together, but Yifan mainly contributed to assignment 1. 
 
 ```{r, warning=FALSE, echo=FALSE, message=FALSE}
 
-nodes <- read.table('trainMeta.dat')
-links <- read.table('trainData.dat')
-links <- aggregate(links[,3], links[,-3], mean)
-colnames(links) <- c("from", "to", "width")
-links <- links[order(links$from, links$to),]
-rownames(links) <- NULL
-links$weight<-links$width
-colnames(nodes) <- c("label", "group")
+nodes <- read.table("trainMeta.dat",sep = " ",header = FALSE)
 
-nodes$id <- c(1:nrow(nodes))
-nodes <- nodes[, c(3,1,2)]
-weight<-lapply(c(1:nrow(nodes)), function(x){return(sum(links$from == x))})
-nodes$value <- as.numeric(weight)
-#nodes$label=nodes$media
-#net <- graph_from_data_frame(d=links, vertices=nodes, directed=T)
-#visIgraph(net)
-#nodes<-nodes[nodes$value!=0, ]
-p <- visNetwork(nodes, links)%>%visIgraphLayout()%>%
-  visPhysics(solver="repulsion")%>% 
-  visOptions(highlightNearest = list(enabled = TRUE, 
-             algorithm = "hierarchical" ),
-             nodesIdSelection = list(enabled = TRUE),
-             selectedBy = list(variable = "weight", selected = 1, highlight=TRUE)) 
-p
+nodes$id <- 1:70
+nodes$label <- as.character(nodes$V1)
+nodes$title <- as.character(nodes$V1)
+nodes$group <- as.character(nodes$V2)
+nodes <- nodes[,3:6]
+
+
+edges <- read.table("trainData.dat", 
+                    header=FALSE)
+colnames(edges) <- c("from", "to", "Value")
+
+graph <- graph_from_data_frame(d=edges, vertices=nodes, directed=T)
+nodes$value <- strength(graph)
+network_1 <- visNetwork(nodes, edges)%>% 
+  visPhysics(solver='repulsion')%>% 
+  visOptions(highlightNearest =   list(enabled = TRUE, degree = 1,
+                                       labelOnly = FALSE, hover = TRUE),
+                                             nodesIdSelection = TRUE)
+
+network_1
 
 
 
 ```
+
+The graph above shows that Jamal Zougam  and Mohamed Chaoui seem to be the center of the network. The first and biggest cluster are around Imad Eddin Barakat. We can also see the group which include people that are involved in the bombing and didn't participate in any camp before which can be obtained of not seeing any thicker lines between them.
+
+When can also see a small cluster in the top containing spanish names, where Ivan Granados seems to be the center of the cluster
+
+We can see that Jamal Zougam and Mohamed Chaoui seems to have the connetion to same people. The bombers seems to be more inte the center of the network than those that didn't were a bomber.
+
+
 
 
 ### Assignment 1.2
 
 ```{r, warning=FALSE, echo=FALSE}
-p <- visNetwork(nodes, links)%>%
-  visPhysics(solver="repulsion")%>%visIgraphLayout()%>% 
-  visOptions(highlightNearest = list(enabled = TRUE, 
-             algorithm = "hierarchical",hover = TRUE, degree = 2 ),
-             nodesIdSelection = list(enabled = TRUE),
-             selectedBy = list(variable = "weight", selected = 1, highlight=TRUE)) 
-p
-```
+network_2 <- network_1 %>% visOptions(highlightNearest = list(enabled = TRUE, degree = 2,
+                                                              labelOnly = FALSE, hover = TRUE),
+                        nodesIdSelection = TRUE)
 
+network_2
+```
+Vinay Kholy is a person with a really big node which is connencted to every bomber with just one step. The same is with Suresh Kumar who also has a very big node. Suresh Kumar and Vinay Kohly are almost connencted to everyone in the network and they are charged with providing the mobile telephones used in the bombings according to google. 
 
 ### Assignment 1.3
 
 
 ```{r, warning=FALSE, echo=FALSE}
 
+nodes_new <- nodes
+graph_new <- graph_from_data_frame(d=edges, 
+                                 vertices = nodes_new, 
+                                 directed = FALSE)
+nodes_new$group <- cluster_edge_betweenness(graph_new)$membership
+network_3 <- visNetwork(nodes_new, edges)%>% 
+  visPhysics(solver='repulsion') %>% 
+  visOptions(highlightNearest = list(enabled = TRUE, degree = 1,
+                                     labelOnly = FALSE, hover = TRUE),
+             nodesIdSelection = TRUE)
 
-nodes1<-nodes
-net <- graph_from_data_frame(d=links, vertices=nodes, directed=F)
-ceb <- cluster_edge_betweenness(net) 
-nodes1$group=ceb$membership
-visNetwork(nodes1,links)%>%visIgraphLayout()%>%
-  visPhysics(solver="repulsion")%>% 
-  visOptions(highlightNearest = list(enabled = TRUE, 
-             algorithm = "hierarchical",hover = TRUE, degree = 2 ),
-             nodesIdSelection = list(enabled = TRUE),
-             selectedBy = list(variable = "weight", selected = 1, highlight=TRUE)) 
+network_3
 
 ```
 
+The plot above shows the network when we have compute clusters by optimizing edge betweenness. The small cluster with the spanish names are also a cluster here. The big cluster with Imad Eddin Barakat are also a cluster here. This network shows way more cluster than we found in assignment 2.
 
 ### Assignment 1.4
 
 ```{r, warning=FALSE, echo=FALSE}
-
-netm <- get.adjacency(net, attr="weight", sparse=F)
-colnames(netm) <- V(net)$media
-rownames(netm) <- V(net)$media
-
+nodes1<-nodes
+net <- graph_from_data_frame(d=edges, vertices=nodes1, directed=F)
+netm <- get.adjacency(net, attr="Value", sparse=F)
+colnames(netm) <- V(net)$label
+rownames(netm) <- V(net)$label
 rowdist<-dist(netm)
-
 library(seriation)
 order1<-seriate(rowdist, "HC")
 ord1<-get_order(order1)
-
 reordmatr<-netm[ord1,ord1]
-
-library(plotly)
-
-plot_ly(z=~reordmatr, x=~colnames(reordmatr), 
+network_4 <- plot_ly(z=~reordmatr, x=~colnames(reordmatr), 
         y=~rownames(reordmatr), type="heatmap")
+network_4
 
 
 ```
+The graph shows that the it seems to be a cluster is the one in the top right of the graph. The cluster seems to be of person that have done bombings or trained together. This cluster contains the same person that the big cluster in the earliers assignments.
 
 
 
@@ -143,12 +149,6 @@ fig <- df %>%
     type = 'scatter',
     mode = 'markers'
   )
-fig <- fig %>% layout(
-    xaxis = list(
-      type = "log"
-    )
-  )
-
 fig
 
 ```
@@ -180,11 +180,6 @@ fig2 <- df%>%filter(Country %in% c("Brazil", "India"))%>%
     type = 'scatter',
     mode = 'markers'
   )
-fig2 <- fig2 %>% layout(
-    xaxis = list(
-      type = "log"
-    )
-  )
 
 fig2
  
@@ -209,8 +204,8 @@ df3 <- rbind(df1,df2)
 countries_list <- c('Brazil', "US", "Germany", "United Kingdom", "France", "India", "Japan", "China")
 
 fig3 <- df3%>%filter(Country == countries_list[1])%>%plot_ly(
-    x = ~Country, 
-    y = ~Oilp, 
+    x = ~Oilp, 
+    y = ~Country, 
     name = countries_list[1],
     frame = ~Year, 
     type = 'scatter',
@@ -222,8 +217,8 @@ fig3 <- df3%>%filter(Country == countries_list[1])%>%plot_ly(
 for(i in c(2:8)){
   
 fig3 <- fig3%>%add_trace(data = df3%>%filter(Country == countries_list[i]),
-                 x = ~Country,
-                 y = ~Oilp,
+                 x = ~Oilp,
+                 y = ~Country,
                  name = countries_list[i],
                  line = list(width = 20))
 
