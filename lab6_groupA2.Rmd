@@ -27,7 +27,7 @@ library(seriation)
 
 # Statement of contribution
 
-We have done most parts together, but Yifan mainly contributed to assignment 1. Hugo mainly contributed to assignment 2.
+We have done most parts together, but Hugo mainly contributed to assignment 1. Yifan mainly contributed to assignment 2.
 
 # Assignment 1
 ### Assignment 1.1 
@@ -62,7 +62,7 @@ network_1
 
 ```
 
-The graph above shows that Jamal Zougam  and Mohamed Chaoui seem to be the center of the network. The first and biggest cluster are around Imad Eddin Barakat. We can also see the group which include people that are involved in the bombing and didn't participate in any camp before which can be obtained of not seeing any thicker lines between them.
+**Answer:**The graph above shows that Jamal Zougam  and Mohamed Chaoui seem to be the center of the network. The first and biggest cluster are around Imad Eddin Barakat. We can also see the group which include people that are involved in the bombing and didn't participate in any camp before which can be obtained of not seeing any thicker lines between them.
 
 When can also see a small cluster in the top containing spanish names, where Ivan Granados seems to be the center of the cluster
 
@@ -80,7 +80,7 @@ network_2 <- network_1 %>% visOptions(highlightNearest = list(enabled = TRUE, de
 
 network_2
 ```
-Vinay Kholy is a person with a really big node which is connencted to every bomber with just one step. The same is with Suresh Kumar who also has a very big node. Suresh Kumar and Vinay Kohly are almost connencted to everyone in the network and they are charged with providing the mobile telephones used in the bombings according to google. 
+**Answer:**Vinay Kholy is a person with a really big node which is connencted to every bomber with just one step. The same is with Suresh Kumar who also has a very big node. Suresh Kumar and Vinay Kohly are almost connencted to everyone in the network and they are charged with providing the mobile telephones used in the bombings according to google. 
 
 ### Assignment 1.3
 
@@ -102,7 +102,7 @@ network_3
 
 ```
 
-The plot above shows the network when we have compute clusters by optimizing edge betweenness. The small cluster with the spanish names are also a cluster here. The big cluster with Imad Eddin Barakat are also a cluster here. This network shows way more cluster than we found in assignment 2.
+**Answer:**The plot above shows the network when we have compute clusters by optimizing edge betweenness. The small cluster with the spanish names are also a cluster here. The big cluster with Imad Eddin Barakat are also a cluster here. This network shows way more cluster than we found in assignment 2.
 
 ### Assignment 1.4
 
@@ -123,7 +123,8 @@ network_4
 
 
 ```
-The graph shows that the it seems to be a cluster is the one in the top right of the graph. The cluster seems to be of person that have done bombings or trained together. This cluster contains the same person that the big cluster in the earliers assignments.
+
+**Answer:**The graph shows that the it seems to be a cluster is the one in the top right of the graph. The cluster seems to be of person that have done bombings or trained together. This cluster contains the same person that the big cluster in the earliers assignments.
 
 
 
@@ -168,7 +169,7 @@ fig
 ```{r}
 
 
-fig2 <- df%>%filter(Country %in% c("Brazil", "India"))%>%
+fig2 <- df%>%filter(Country %in% c("Germany", "France"))%>%
   plot_ly(
     x = ~Coal, 
     y = ~Oil, 
@@ -185,7 +186,7 @@ fig2
  
 ```
 
-**Answer:** We find Brazil and India have the same motion pattern. India and Brazil both started their Oil industry in 1960s, which could refer to Wikipedia, [Oil and gas industry in India](https://en.wikipedia.org/wiki/Oil_and_gas_industry_in_India) and [Energy in Brazil](https://en.wikipedia.org/wiki/Energy_in_Brazil). Since they both start to use Oil from 1960s, it is possible that Brazil and India might have some similar purpose to consume or produce Oil, this might explain that why they have similar motion pattern from above chart.
+**Answer:** We find Germany and France have the same motion pattern. They have similar motion pattern might due to they have similar energy consumption structure. Around 1989, they both drastically reduced the usage of Coal, this might because the nuclear power plants were built to replace Coal in both country or maybe the end of Cold War. 
 
 
 ### Assignment 2.3
